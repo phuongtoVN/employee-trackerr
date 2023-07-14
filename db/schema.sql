@@ -1,6 +1,6 @@
-CREATE DATABASE company_db;
+CREATE DATABASE company_database;
 
-USE company_db;
+USE company_database;
 
 CREATE TABLE department (
   id INT PRIMARY KEY,

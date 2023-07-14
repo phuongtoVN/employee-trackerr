@@ -5,9 +5,9 @@ const fs = require('fs');
 // Create a MySQL connection
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'your_username',
-  password: 'your_password',
-  database: 'company_db',
+  user: 'phuong_to',
+  password: 'Vietnam12!',
+  database: 'company_database',
 });
 
 const options = [
@@ -48,13 +48,7 @@ const addRole = [
     name: "department",
     message: "Which department does the role belong to?",
     type: "list",
-    choices: [
-      "Engineering",
-      "Finance",
-      "Legal",
-      "Sales",
-      "Service",
-    ],
+    choices: [],
   },
 ];
 
@@ -112,6 +106,27 @@ function fetchEmployeeNames() {
 
     // Update the choices array in the updateEmployee object
     updateEmployee[0].choices = employeeNames;
+
+    // Call the fetchDepartment function
+    fetchDepartment();
+  });
+}
+
+function fetchDepartment() {
+  connection.query('SELECT id, name FROM department', (error, results) => {
+    if (error) {
+      console.error('Error fetching departments:', error);
+      return;
+    }
+
+    // Extract the department data from the query results
+    const departments = results.map((row) => ({ name: row.name, value: row.id }));
+
+    // Update the choices array in the addRole object
+    addRole[2].choices = departments;
+
+    // Call the promptUser function to start the prompt
+    promptUser();
   });
 }
 
@@ -126,7 +141,7 @@ function promptUser() {
           console.error('Error fetching employees:', error);
           return;
         }
-  
+
         console.table(results);
       });
     } else if (selectedOption === "Add Employee") {
@@ -146,7 +161,7 @@ function promptUser() {
               console.error('Error adding employee:', error);
               return;
             }
-  
+
             console.log("Employee added successfully!");
           }
         );
@@ -163,7 +178,7 @@ function promptUser() {
               console.error('Error updating employee role:', error);
               return;
             }
-  
+
             console.log("Employee role updated successfully!");
           }
         );
@@ -180,7 +195,7 @@ function promptUser() {
               console.error('Error adding role:', error);
               return;
             }
-  
+
             console.log("Role added successfully!");
           }
         );
@@ -192,7 +207,7 @@ function promptUser() {
           console.error('Error fetching departments:', error);
           return;
         }
-  
+
         console.table(results);
       });
     } else if (selectedOption === "Add Department") {
@@ -207,9 +222,9 @@ function promptUser() {
               console.error('Error adding department:', error);
               return;
             }
-  
+
             console.log("Department added successfully!");
-  
+
             // Append the new department to the seeds.sql file
             const seedQuery = `INSERT INTO department (id, name) VALUES (${results.insertId}, '${departmentAnswer.department}');\n`;
             fs.appendFile('seeds.sql', seedQuery, (error) => {
@@ -217,7 +232,7 @@ function promptUser() {
                 console.error('Error updating seeds.sql:', error);
                 return;
               }
-  
+
               console.log("seeds.sql updated successfully!");
             });
           }
@@ -232,6 +247,3 @@ function promptUser() {
 }
 
 fetchEmployeeNames();
-
-// Call the promptUser function to start the prompt
-promptUser();
