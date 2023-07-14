@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const fs = require('fs');
 
 // Create a MySQL connection
 const connection = mysql.createConnection({
@@ -193,6 +194,34 @@ function promptUser() {
         }
   
         console.table(results);
+      });
+    } else if (selectedOption === "Add Department") {
+      // Prompt user to add a new department
+      inquirer.prompt(addDepartment).then((departmentAnswer) => {
+        // Insert the new department into the database
+        connection.query(
+          `INSERT INTO department (name) VALUES (?)`,
+          [departmentAnswer.department],
+          (error, results) => {
+            if (error) {
+              console.error('Error adding department:', error);
+              return;
+            }
+  
+            console.log("Department added successfully!");
+  
+            // Append the new department to the seeds.sql file
+            const seedQuery = `INSERT INTO department (id, name) VALUES (${results.insertId}, '${departmentAnswer.department}');\n`;
+            fs.appendFile('seeds.sql', seedQuery, (error) => {
+              if (error) {
+                console.error('Error updating seeds.sql:', error);
+                return;
+              }
+  
+              console.log("seeds.sql updated successfully!");
+            });
+          }
+        );
       });
     } else if (selectedOption === "Quit") {
       // End the connection and exit the program
