@@ -1,4 +1,13 @@
 const inquirer = require('inquirer');
+const mysql = require('mysql2');
+
+// Create a MySQL connection
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: '',
+  password: '',
+  database: 'company_db',
+});
 
 const options = [
     {
@@ -17,15 +26,13 @@ const options = [
     },
 ];
 
-const add_department = [
-    {
-        name: "department",
-        message: "What is the name of the department?",
-        type: "input",
-    }
-]
+const addDepartment = {
+    name: "department",
+    message: "What is the name of the department?",
+    type: "input",
+};
 
-const add_role = [
+const addRole = [
     {
         name: "role",
         message: "What is the name of the role?", 
@@ -39,7 +46,7 @@ const add_role = [
 
     {
         name: "department",
-        message: "Which department does sthe role belong to?",
+        message: "Which department does the role belong to?",
         type: "list",
         choices: [
             "Engineering",
@@ -51,7 +58,7 @@ const add_role = [
     },
 
 ];
-const add_employee = [
+const addEmployee = [
     {
         name: "first_name",
         message: "What is employee's first name?", 
@@ -62,10 +69,10 @@ const add_employee = [
         message: "What is employee?'s last name", 
         type: "input",
     },
-    add_role,
+    addRole[0],
     {
         name: "manager",
-        message: "Who is employee?'s manager", 
+        message: "Who is employee's manager?", 
         type: "list",
         choices: [
             "None",
@@ -78,9 +85,42 @@ const add_employee = [
         ]
     },
 
+];
+
+const updateEmployee = [
+    {
+        name: "employee",
+        message: "Which employee's role do you want to update?",
+        type: "list",
+        choices: []
+    },
+    {
+        name: "role", 
+        message: "Which role do you want to assign the selected employee?"
+    }
 ]
 
 
+function fetchEmployeeNames() {
+    connection.query('SELECT first_name, last_name FROM employee', (error, results) => {
+      if (error) {
+        console.error('Error fetching employee names:', error);
+        return;
+      }
+  
+      // Extract the employee names from the query results
+      const employeeNames = results.map((row) => `${row.first_name} ${row.last_name}`);
+  
+      // Update the choices array in the updateEmployee object
+      updateEmployee[0].choices = employeeNames;
+    });
+}
 
+function promptUser() {
+    inquirer.prompt(options).then((answers) => {
+      
+    });
+  }
 
+fetchEmployeeNames();
 
